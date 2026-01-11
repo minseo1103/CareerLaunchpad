@@ -22,7 +22,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/career-launchpad.git
+   git clone https://github.com/minseo1103/CareerLaunchpad.git
    ```
 
 2. **Install dependencies**
