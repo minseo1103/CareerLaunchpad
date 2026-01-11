@@ -1,16 +1,20 @@
+
 import React, { useState } from 'react'
 import { supabase } from './supabaseClient'
 
 export default function Auth() {
     const [loading, setLoading] = useState(false)
-    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+
+    // Helper to create a dummy email from username
+    const getEmail = (uid) => `${uid} @career.launchpad`
 
     const handleLogin = async (e) => {
         e.preventDefault()
         setLoading(true)
         const { error } = await supabase.auth.signInWithPassword({
-            email,
+            email: getEmail(username),
             password,
         })
         if (error) alert(error.message)
@@ -21,13 +25,13 @@ export default function Auth() {
         e.preventDefault()
         setLoading(true)
         const { error } = await supabase.auth.signUp({
-            email,
+            email: getEmail(username),
             password,
         })
         if (error) {
             alert(error.message)
         } else {
-            alert('Check your email for the login link!')
+            alert('Account created! You can now log in.')
         }
         setLoading(false)
     }
@@ -38,7 +42,7 @@ export default function Auth() {
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
-            background: 'var(--bg-primary)' // Matches index.css theme
+            background: 'var(--bg-primary)'
         }}>
             <div className="auth-box" style={{
                 padding: '2rem',
@@ -56,11 +60,11 @@ export default function Auth() {
                 <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <input
                         className="input"
-                        type="email"
-                        placeholder="Your email"
-                        value={email}
+                        type="text"
+                        placeholder="Username"
+                        value={username}
                         required={true}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value)}
                         style={{
                             padding: '0.75rem',
                             borderRadius: '8px',
@@ -73,7 +77,7 @@ export default function Auth() {
                     <input
                         className="input"
                         type="password"
-                        placeholder="Your password"
+                        placeholder="Password"
                         value={password}
                         required={true}
                         onChange={(e) => setPassword(e.target.value)}
@@ -116,3 +120,4 @@ export default function Auth() {
         </div>
     )
 }
+
