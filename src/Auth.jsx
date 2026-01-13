@@ -8,7 +8,7 @@ export default function Auth() {
     const [password, setPassword] = useState('')
 
     // Helper to create a dummy email from username
-    const getEmail = (uid) => `${uid} @career.launchpad`
+    const getEmail = (uid) => `${uid}@career.launchpad`
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -42,12 +42,12 @@ export default function Auth() {
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
-            background: 'var(--bg-primary)'
+            background: 'var(--bg-color)'
         }}>
             <div className="auth-box" style={{
                 padding: '2rem',
                 borderRadius: '12px',
-                background: 'var(--bg-secondary)',
+                background: 'var(--card-bg)',
                 border: '1px solid var(--border-color)',
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                 width: '100%',
