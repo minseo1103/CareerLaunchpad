@@ -6,12 +6,28 @@ export default function Auth() {
     const [loading, setLoading] = useState(false)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [errorMsg, setErrorMsg] = useState('')
 
     // Helper to create a dummy email from username
-    const getEmail = (uid) => `${uid}@career.launchpad`
+    const getEmail = (uid) => `${uid}@example.com`
+
+    const validate = () => {
+        if (password.length < 6) {
+            setErrorMsg('Password must be at least 6 characters')
+            return false
+        }
+        if (username.length < 3) {
+            setErrorMsg('Username must be at least 3 characters')
+            return false
+        }
+        return true
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault()
+        setErrorMsg('')
+        if (!validate()) return
+
         setLoading(true)
         const { error } = await supabase.auth.signInWithPassword({
             email: getEmail(username),

@@ -7,18 +7,25 @@ const STATUS_OPTIONS = ['Pending', 'Interview', 'Decline', 'Accepted'];
 function App() {
   const [session, setSession] = useState(null)
 
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
   useEffect(() => {
+    // Only verify session on mount, let onAuthStateChange handle the rest
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      if (session) fetchApplications();
+      if (!session) setIsInitialLoading(false);
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-      if (session) fetchApplications();
-      else setApplications([]);
+      if (session) {
+        fetchApplications().finally(() => setIsInitialLoading(false));
+      } else {
+        setApplications([]);
+        setIsInitialLoading(false);
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -238,6 +245,11 @@ function App() {
 
   return (
     <div className="container">
+      {isInitialLoading && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'var(--bg-color)', zIndex: 2000 }}>
+          <div className="loading" style={{ width: '3rem', height: '3rem', borderWidth: '4px' }}></div>
+        </div>
+      )}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1>Internship Tracker</h1>
@@ -264,19 +276,18 @@ function App() {
         </button>
       </div>
 
-      <div className="filter-section" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div className="filter-section">
         <input
           type="text"
           className="search-input"
           placeholder="Search company or position..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ flex: 1, padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'white' }}
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'white' }}
+          className="filter-select"
         >
           <option value="All">All Statuses</option>
           {STATUS_OPTIONS.map(opt => (
@@ -369,6 +380,7 @@ function App() {
           <span>{toast.message}</span>
           {toast.undoAction && (
             <button className="toast-undo-btn" onClick={() => {
+              if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
               toast.undoAction();
             }}>
               Undo
